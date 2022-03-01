@@ -1,0 +1,75 @@
+# Time intervals
+tints:
+  # Overview time interval
+  overview: ["2017-07-23T16:10:00.000", "2017-07-23T18:10:00.000"]
+  # Flapping time interval
+  closeups: ["2019-09-14T07:54:00.000", "2019-09-14T08:11:00.000"]
+
+
+data_path: "/Users/louisr/Documents/PhD/Y2/jet_fronts/data"
+
+# MEC parameters
+mec:
+  # MEC data rate
+  data_rate: "srvy"
+  # MEC data level
+  level: "l2"
+
+# Flux Gate Magnetometer parameters
+fgm:
+  # Flux Gate Magnetometer data rate
+  data_rate: "srvy"
+  # Flux Gate Magnetometer data level
+  level: "l2"
+
+# Electric Double Probe (EDP) parameters
+edp:
+  # Electric Double Probe data rate
+  data_rate: "fast"
+  # Electric Double Probe data level
+  level: "l2"
+
+# Fast Plasma Investigation parameters
+fpi:
+  # Fast Plasma Investigation data rate
+  data_rate: "fast"
+  # Fast Plasma Investigation data level
+  level: "l2"
+
+# Hot Plasma Composition Analyser parameters
+hpca:
+  # Hot Plasma Composition Analyser data rate
+  data_rate: "srvy"
+  # Hot Plasma Composition Analyser data level
+  level: "l2"
+
+# Fly Eye Energetic Particle Spectrometer parameters
+feeps:
+  # Fly Eye Energetic Particle Spectrometer data rate
+  data_rate: "srvy"
+  # Fly Eye Energetic Particle Spectrometer data level
+  level: "l2"
+
+# Figure parameters
+figure:
+  main:
+    # Figure size
+    figsize: [6.5, 9]
+
+  # Grid spec parameters
+  gridspec:
+    # Left bound
+    left: 0.15
+    # Right bound
+    right: 0.85
+    # Bottom bound
+    bottom: 0.05
+    # Top bound
+    top: .99
+    # Vertical spacing
+    hspace: .0
+
+  # Save parameters
+  save:
+    # DPI
+    dpi: 500

@@ -1,0 +1,41 @@
+# Time intervals
+tints: [['2017-07-23T16:54:14.000000', '2017-07-23T16:59:25.745247'],
+        ['2017-07-23T17:17:11.000000', '2017-07-23T17:22:36.000000']]
+
+
+data_path: "/Users/louisr/Documents/PhD/Y2/jet_fronts/data"
+
+# Energetic Ion Spectrometer parameters
+eis:
+  # Energetic Ion Spectrometer data rate
+  data_rate: "brst"
+  # Energetic Ion Spectrometer data level
+  level: "l2"
+
+# Flux Gate Magnetometer parameters
+fgm:
+  # Flux Gate Magnetometer data rate
+  data_rate: "brst"
+  # Flux Gate Magnetometer data level
+  level: "l2"
+
+# Electric Double Probe (EDP) parameters
+edp:
+  # Electric Double Probe data rate
+  data_rate: "brst"
+  # Electric Double Probe data level
+  level: "l2"
+
+# Fast Plasma Investigation parameters
+fpi:
+  # Fast Plasma Investigation data rate
+  data_rate: "brst"
+  # Fast Plasma Investigation data level
+  level: "l2"
+
+# Hot Plasma Composition Analyser parameters
+hpca:
+  # Hot Plasma Composition Analyser data rate
+  data_rate: "brst"
+  # Hot Plasma Composition Analyser data level
+  level: "l2"

@@ -1,4 +1,4 @@
-# Turbulent Jet Fronts and Related Ion Acceleration
+# Ion Acceleration at Magnetotail Plasma Jets
 [![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE) [![LASP](https://img.shields.io/badge/datasets-MMS_SDC-orange.svg)](https://lasp.colorado.edu/mms/sdc/)
 
 Code for the paper Ion Acceleration at Magnetotail Plasma Jets
@@ -7,13 +7,13 @@ Code for the paper Ion Acceleration at Magnetotail Plasma Jets
 
 We investigate a series of Earthward bursty bulk flows (BBFs) observed by the 
 Magnetospheric Multiscale (MMS) spacecraft in Earth’s magnetotail at 
-(-24, 7, 4)~$R_E$ in Geocentric Solar Magnetospheric (GSM) coordinates. At the 
+(-24, 7, 4) $R_E$ in Geocentric Solar Magnetospheric (GSM) coordinates. At the 
 leading edges of the BBFs, we observe complex magnetic field structures. In 
 particular, we focus on one which presents a chain of small scale 
-($\sim 0.5~R_E$) dipolarizations, and another with a large scale 
-($\sim 3.5~R_E$) dipolarization. Although the two structures have different 
+($\sim 0.5 R_E$) dipolarizations, and another with a large scale 
+($\sim 3.5 R_E$) dipolarization. Although the two structures have different 
 scales, both of these structures are associated with flux increases of 
-supra-thermal ions with energies $\gtrsim 100~\textrm{keV}$. We investigate 
+supra-thermal ions with energies $\gtrsim 100 \textrm{keV}$. We investigate 
 the ion acceleration mechanism and its dependence on the mass and charge state. 
 We show that the ions with gyroradii smaller than the scale of the structure 
 are accelerated by the ion bulk flow. We show that whereas in the small scale 

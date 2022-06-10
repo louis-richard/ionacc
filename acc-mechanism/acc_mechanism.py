@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Built-in imports
+import pdb
 import argparse
 import warnings
 
@@ -15,9 +16,10 @@ import matplotlib.dates as mdates
 from uncertainties import ufloat
 from scipy import interpolate, constants
 from pyrfu import mms, pyrf
-from pyrfu.plot import plot_line, span_tint, make_labels
+from pyrfu.plot import plot_line, span_tint, make_labels, plot_spectr
 
 from jfs.load import load_eb_mmsx, load_fpi_moments_mmsx, load_eis_allt_mmsx
+
 
 __author__ = "Louis Richard"
 __email__ = "louisr@irfu.se"
@@ -129,7 +131,8 @@ def main(args):
     vdf_eis_i.theta.data += 90.
 
     vdf_eis_i_sfrm = vdf_eis_i
-    vdf_eis_i_ifrm = mms.vdf_frame_transformation(vdf_eis_i_sfrm, 1e3 * v_gse_i)
+    vdf_eis_i_ifrm = mms.vdf_frame_transformation(vdf_eis_i_sfrm,
+                                                  1e3 * v_gse_i)
 
     vdf_eis_omni_i_sfrm = mms.vdf_omni(vdf_eis_i_sfrm)
     vdf_eis_omni_i_ifrm = mms.vdf_omni(vdf_eis_i_ifrm)
@@ -204,35 +207,85 @@ def main(args):
                                           vdf_eis_omni_peak_ifrm,
                                           erd_eis_omni_peak_ifrm)
 
-    fig = plt.figure(figsize=(15, 10))
-    gsp = fig.add_gridspec(20, 2, top=.95, bottom=.06, left=.08, right=.92,
-                           hspace=0.)
+    if args.t_id == 0:
+        t_plus = 2 / 5e-2
+        tint_long = pyrf.extend_tint(tints_brst[args.t_id], [-t_plus, t_plus])
+        b_long = mms.get_data("b_gsm_fgm_srvy_l2", tint_long, 1)
+        b_long = b_long.rename({"represent_vec_tot": "comp"})
+        b_cwt = pyrf.wavelet(b_long, f_range=[5e-2, 1e0], n_freqs=100)
+        b_cwt_t = b_cwt.x + b_cwt.y + b_cwt.z
 
-    gsp0 = gsp[:9, :].subgridspec(3, 1, hspace=0)
-    gsp1 = gsp[11:, :].subgridspec(1, 3, hspace=0.3, wspace=.3)
+        fig = plt.figure(figsize=(15, 12))
+        gsp = fig.add_gridspec(22, 2, top=.95, bottom=.06, left=.08, right=.92,
+                               hspace=0.)
 
-    # Create axes in the grid spec
-    axs00 = [fig.add_subplot(gsp0[i]) for i in range(3)]
-    axs10 = [fig.add_subplot(gsp1[i]) for i in range(3)]
+        gsp0 = gsp[:11, :].subgridspec(4, 1, hspace=0)
+        gsp1 = gsp[13:, :].subgridspec(1, 3, hspace=0.3, wspace=.3)
 
-    plot_line(axs00[0], b_gsm)
-    plot_line(axs00[0], pyrf.norm(b_gsm))
-    axs00[0].legend(["$B_x$", "$B_y$", "$B_z$", "|B|"], frameon=True, ncol=4,
-                    loc="upper right")
-    axs00[0].set_ylabel("$B$" + "\n" + "[nT]")
-    axs00[0].set_ylim([-8, 15])
+        # Create axes in the grid spec
+        axs00 = [fig.add_subplot(gsp0[i]) for i in range(4)]
+        axs10 = [fig.add_subplot(gsp1[i]) for i in range(3)]
 
-    plot_line(axs00[1], e_gsm[:, 1], label="$E_y$")
-    plot_line(axs00[1], -1e-3 * pyrf.cross(v_gsm_i, b_gsm)[:, 1],
-              label="$-(V_i\\times B)_y$")
-    axs00[1].set_ylabel("$E_y$" + "\n" + "[mV m$^{-1}$]")
-    axs00[1].legend(frameon=True, ncol=3, loc="upper right")
-    axs00[1].set_ylim([-7, 8])
+        axs00[0], caxs000 = plot_spectr(axs00[0], b_cwt_t, yscale="log",
+                                        cscale="log", cmap="Spectral_r",
+                                        clim=[1e0, 1e2])
 
-    plot_line(axs00[2], v_gsm_i)
-    axs00[2].legend(["$V_{xi}$", "$V_{yi}$", "$V_{zi}$"], frameon=True,
-                    ncol=3, loc="upper right")
-    axs00[2].set_ylabel("$V_{p}$" + "\n" + "[km s$^{-1}$]")
+        axs00[0].set_ylabel("$f$" + "\n" + "[Hz]")
+        axs00[0].set_ylim([5e-2, 1e0])
+        caxs000.set_ylabel("$B^2$ [nT$^2$ Hz$^{-1}$]")
+
+        plot_line(axs00[1], b_gsm)
+        plot_line(axs00[1], pyrf.norm(b_gsm))
+        axs00[1].legend(["$B_x$", "$B_y$", "$B_z$", "|B|"], frameon=True,
+                        ncol=4,
+                        loc="upper right")
+        axs00[1].set_ylabel("$B$" + "\n" + "[nT]")
+        axs00[1].set_ylim([-8, 15])
+
+        plot_line(axs00[2], e_gsm[:, 1], label="$E_y$")
+        plot_line(axs00[2], -1e-3 * pyrf.cross(v_gsm_i, b_gsm)[:, 1],
+                  label="$-(V_i\\times B)_y$")
+        axs00[2].set_ylabel("$E_y$" + "\n" + "[mV m$^{-1}$]")
+        axs00[2].legend(frameon=True, ncol=3, loc="upper right")
+        axs00[2].set_ylim([-7, 8])
+
+        plot_line(axs00[3], v_gsm_i)
+        axs00[3].legend(["$V_{ix}$", "$V_{iy}$", "$V_{iz}$"], frameon=True,
+                        ncol=3, loc="upper right")
+        axs00[3].set_ylabel("$V_{i}$" + "\n" + "[km s$^{-1}$]")
+
+    else:
+        fig = plt.figure(figsize=(15, 10))
+        gsp = fig.add_gridspec(20, 2, top=.95, bottom=.06, left=.08, right=.92,
+                               hspace=0.)
+
+        gsp0 = gsp[:9, :].subgridspec(3, 1, hspace=0)
+        gsp1 = gsp[11:, :].subgridspec(1, 3, hspace=0.3, wspace=.3)
+
+        # Create axes in the grid spec
+        axs00 = [fig.add_subplot(gsp0[i]) for i in range(3)]
+        axs10 = [fig.add_subplot(gsp1[i]) for i in range(3)]
+
+        plot_line(axs00[0], b_gsm)
+        plot_line(axs00[0], pyrf.norm(b_gsm))
+        axs00[0].legend(["$B_x$", "$B_y$", "$B_z$", "|B|"], frameon=True,
+                        ncol=4,
+                        loc="upper right")
+        axs00[0].set_ylabel("$B$" + "\n" + "[nT]")
+        axs00[0].set_ylim([-8, 15])
+
+        plot_line(axs00[1], e_gsm[:, 1], label="$E_y$")
+        plot_line(axs00[1], -1e-3 * pyrf.cross(v_gsm_i, b_gsm)[:, 1],
+                  label="$-(V_i\\times B)_y$")
+        axs00[1].set_ylabel("$E_y$" + "\n" + "[mV m$^{-1}$]")
+        axs00[1].legend(frameon=True, ncol=3, loc="upper right")
+        axs00[1].set_ylim([-7, 8])
+
+        plot_line(axs00[2], v_gsm_i)
+        axs00[2].legend(["$V_{ix}$", "$V_{iy}$", "$V_{iz}$"], frameon=True,
+                        ncol=3, loc="upper right")
+        axs00[2].set_ylabel("$V_{i}$" + "\n" + "[km s$^{-1}$]")
+
     span_tint(axs00, tint_pre_plot, facecolor="tab:orange", linestyle="--",
               edgecolor="k", alpha=.2)
     span_tint(axs00, tint_post, facecolor="tab:olive", linestyle="-",
@@ -270,8 +323,8 @@ def main(args):
 
     axs10[0].set_xlim([0, 250])
     axs10[0].set_ylim([5e-22, 5e-15])
-    axs10[0].set_xlabel("$K$ [keV]")
-    axs10[0].set_ylabel("$f$ [s$^3$ m$^{-6}$]")
+    axs10[0].set_xlabel("$K_p$ [keV]")
+    axs10[0].set_ylabel("$f_p$ [s$^3$ m$^{-6}$]")
     axs10[0].set_yscale("log")
     # axs10[0].set_title("Spacecraft frame")
 
@@ -295,8 +348,8 @@ def main(args):
 
     axs10[1].set_xlim([0, 250])
     axs10[1].set_ylim([5e-22, 5e-15])
-    axs10[1].set_xlabel("$K$ [keV]")
-    axs10[1].set_ylabel("$f$ [s$^3$ m$^{-6}$]")
+    axs10[1].set_xlabel("$K_p$ [keV]")
+    axs10[1].set_ylabel("$f_p$ [s$^3$ m$^{-6}$]")
     axs10[1].set_yscale("log")
     # axs10[1].set_title("Proton bulk frame")
 
@@ -309,31 +362,27 @@ def main(args):
     axs10[2].set_xlim([0, 250])
 
     if args.t_id == 1:
-        b_max = np.max(pyrf.norm(pyrf.time_clip(b_gsm, tint_post)).data)
-
+        v_avg = np.mean(pyrf.norm(pyrf.time_clip(v_gsm_i, tint_post)).data)
+        v_std = np.std(pyrf.norm(pyrf.time_clip(v_gsm_i, tint_post)).data)
+        v_bulk = ufloat(v_avg, v_std)
+        b_avg = np.mean(pyrf.norm(pyrf.time_clip(b_gsm, tint_post)).data)
+        delta_t = 27
+        x_scale = delta_t * v_bulk / 6371
         axs10[2].plot(np.linspace(0, 200),
-                      mod_pulse(np.linspace(0, 200) * 1e3, 9.64, 7.18) / 1e3,
+                      mod_pulse(np.linspace(0, 200) * 1e3, b_avg, 2.92) / 1e3,
+                      # 7.18
                       color="k", linestyle="-.",
-                      label="$\\delta K = 2eE_y\\rho_p$")
-        axs10[2].set_ylim([0, 250])
+                      label="$\\delta K_p = 2eE_y\\rho_p$")
+        axs10[2].set_ylim([0, 150])
 
     elif args.t_id == 0:
-        tint_front = ["2017-07-23T16:55:35", "2017-07-23T16:55:41"]
-        v_avg = np.mean(pyrf.norm(pyrf.time_clip(v_gsm_i, tint_front)).data)
-        v_std = np.std(pyrf.norm(pyrf.time_clip(v_gsm_i, tint_front)).data)
+        v_avg = np.mean(pyrf.norm(pyrf.time_clip(v_gsm_i, tint_post)).data)
+        v_std = np.std(pyrf.norm(pyrf.time_clip(v_gsm_i, tint_post)).data)
         v_bulk = ufloat(v_avg, v_std)
-        b_max = np.max(pyrf.norm(pyrf.time_clip(b_gsm, tint_front)).data)
+        b_avg = np.mean(pyrf.norm(pyrf.time_clip(b_gsm, tint_post)).data)
+        delta_t = 4.22924287
+        x_scale = delta_t * v_bulk / 6371
 
-        e_std = np.std(pyrf.time_clip(e_gse, tint_pre)[:, 1]).data
-        idx = np.where(np.abs(pyrf.time_clip(e_gse, tint_front)[:,
-                              1]) > 3.16 * e_std)[0][[0, -1]]
-        delta_t = np.diff(e_gse.time.data[idx])[0].astype(int) / 1e9
-
-        e_ = (delta_t * v_bulk * b_max / 144) ** 2
-        axs10[2].axvspan((e_.nominal_value - e_.std_dev) / 1e3,
-                         (e_.nominal_value + e_.std_dev) / 1e3,
-                         color="gold", alpha=.2)
-        axs10[2].axvline(e_.nominal_value / 1e3, color="gold", linestyle="--")
         axs10[2].set_ylim([0, 50])
 
     else:
@@ -344,18 +393,22 @@ def main(args):
     for ax, axb in zip(axs10, axs10b):
         axb = ax.twiny()
         axb.set_xticks(ax.get_xticks())
-        rho_i = 144 * np.sqrt(ax.get_xticks() * 1e3) / b_max / 6371
+        rho_i = 144 * np.sqrt(ax.get_xticks() * 1e3) / b_avg / 6371
         axb.set_xticklabels([f"{r:3.2f}" for r in rho_i])
         axb.set_xlabel("$\\rho_p$ [$R_E$]")
 
-    axs10[2].set_xlabel("$K_0$ [keV]")
-    axs10[2].set_ylabel("$\\delta K$ [keV]")
+    axs10[2].set_xlabel("$K_{p0}$ [keV]")
+    axs10[2].set_ylabel("$\\delta K_p$ [keV]")
     axs10[2].legend(frameon=True, loc="upper right")
     axs10[2].set_xlim([0, 250])
-    y_max = [50, 250]
+    y_max = [50, 150]
     axs10[2].set_ylim([0, y_max[args.t_id]])
     make_labels(axs00, [.01, .85], 0)
-    make_labels(axs10, [.025, .94], 3)
+
+    if args.t_id == 0:
+        make_labels(axs10, [.025, .94], 4)
+    else:
+        make_labels(axs10, [.025, .94], 3)
 
     fig.suptitle(f"Event {'I' * (args.t_id + 1)} ("
                  f"{tints_brst[args.t_id][0][:-7]} -"

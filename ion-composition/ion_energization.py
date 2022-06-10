@@ -165,10 +165,10 @@ def main(args):
                                     ~np.isnan(dpf_eis_peak_a.data)))[0]
     slope_peak_a = np.polyfit(np.log10(dpf_eis_peak_a.energy.data[idx_a]),
                               np.log10(dpf_eis_peak_a.data[idx_a]), 1)[0]
-    gamma_p = f"$\gamma_{{s.}}$ = {slope_sour_p:2.1f}\n" \
-              f"$\gamma_{{e.}}$ = {slope_peak_p:2.1f}"
-    gamma_a = f"$\gamma_{{s.}}$ = {slope_sour_a:2.1f}\n" \
-              f"$\gamma_{{e.}}$ = {slope_peak_a:2.1f}"
+    gamma_p_s = f"$\gamma_{{s.}}$ = {slope_sour_p:2.1f}"
+    gamma_p_e = f"$\gamma_{{e.}}$ = {slope_peak_p:2.1f}"
+    gamma_a_s = f"$\gamma_{{s.}}$ = {slope_sour_a:2.1f}"
+    gamma_a_e = f"$\gamma_{{e.}}$ = {slope_peak_a:2.1f}"
 
 
     # %%
@@ -219,28 +219,28 @@ def main(args):
     # Pre enhancement
     err_hp_s = axs10[0].errorbar(dpf_eis_sour_p.energy.data,
                                  dpf_eis_sour_p.data, err_eis_sour_p,
-                                 color="tab:blue", linestyle="--", capsize=4)
+                                 color="tab:orange", linestyle="-", capsize=4)
 
     # Post enhancement
     err_hp_e = axs10[0].errorbar(dpf_eis_peak_p.energy.data,
                                  dpf_eis_peak_p.data, err_eis_peak_p,
-                                 color="tab:blue", linestyle="-", capsize=4)
+                                 color="tab:green", linestyle="-", capsize=4)
 
     # Helium
     # Pre enhancement
     err_he_s = axs10[0].errorbar(dpf_eis_sour_a.energy.data,
                                  dpf_eis_sour_a.data, err_eis_sour_a,
-                                 capsize=4, color="tab:red", linestyle="--")
+                                 capsize=4, color="tab:red", linestyle="-")
 
     # Post enhancement
     err_he_e = axs10[0].errorbar(dpf_eis_peak_a.energy.data,
                                 dpf_eis_peak_a.data, err_eis_peak_a,
-                                 color="tab:red", linestyle="-", capsize=4)
+                                 color="k", linestyle="-", capsize=4)
 
     axs10[0].plot(dpf_hpca_sour_a.energy.data / 1e3, dpf_hpca_sour_a.data,
-                  linestyle="--", color="tab:red")
-    axs10[0].plot(dpf_hpca_peak_a.energy.data / 1e3, dpf_hpca_peak_a.data,
                   linestyle="-", color="tab:red")
+    axs10[0].plot(dpf_hpca_peak_a.energy.data / 1e3, dpf_hpca_peak_a.data,
+                  linestyle="-", color="k")
 
     axs10[0].set_xlim([1e1, 1e3])
     axs10[0].set_xlabel("$K$ [keV]")
@@ -265,34 +265,36 @@ def main(args):
     # Pre enhancement
     err_hp_s = axs10[1].errorbar(dpf_eis_sour_p.energy.data / 1,
                                  dpf_eis_sour_p.data, err_eis_sour_p,
-                                 color="tab:blue", linestyle="--",
+                                 color="tab:orange", linestyle="-",
                                  capsize=4)
     # Post enhancement
     err_hp_e = axs10[1].errorbar(dpf_eis_peak_p.energy.data / 1,
                                  dpf_eis_peak_p.data, err_eis_peak_p,
-                                 color="tab:blue", linestyle="-", capsize=4)
+                                 color="tab:green", linestyle="-", capsize=4)
 
     # Helium
     # Pre enhancement
     err_he_s = axs10[1].errorbar(dpf_eis_sour_a.energy.data / 2,
                                  dpf_eis_sour_a.data, err_eis_sour_a,
-                                 color="tab:red", linestyle="--", capsize=4)
+                                 color="tab:red", linestyle="-", capsize=4)
     # Post enhancement
     err_he_e = axs10[1].errorbar(dpf_eis_peak_a.energy.data / 2,
                                  dpf_eis_peak_a.data, err_eis_peak_a,
-                                 color="tab:red", linestyle="-", capsize=4)
+                                 color="k", linestyle="-", capsize=4)
 
     axs10[1].plot(dpf_hpca_sour_a.energy.data / 2e3, dpf_hpca_sour_a.data,
-                  linestyle="--", color="tab:red")
-    axs10[1].plot(dpf_hpca_peak_a.energy.data / 2e3, dpf_hpca_peak_a.data,
                   linestyle="-", color="tab:red")
+    axs10[1].plot(dpf_hpca_peak_a.energy.data / 2e3, dpf_hpca_peak_a.data,
+                  linestyle="-", color="k")
 
     axs10[1].set_xlim([1e1, 1e3])
-    axs10[1].set_xlabel("$K / q$ [keV / q]")
+    axs10[1].set_xlabel("$K / q$ [keV/q]")
     axs10[1].set_ylim([3e-3, 3e5])
     axs10[1].set_ylabel("Diff. Flux" + "\n" + "[(cm$^2$ s sr keV)$^{-1}$]")
-    axs10[1].text(3.2e2, 1e1, gamma_p, color="tab:blue")
-    axs10[1].text(3.2e2, 1e-1, gamma_a, color="tab:red")
+    axs10[1].text(3.2e2, 1e2, gamma_p_s, color="tab:orange")
+    axs10[1].text(3.2e2, 1e1, gamma_p_e, color="tab:green")
+    axs10[1].text(3.2e2, 1e0, gamma_a_s, color="tab:red")
+    axs10[1].text(3.2e2, 1e-1, gamma_a_e, color="k")
     l10 = axs10[1].legend([(err_hp_s, err_he_s), (err_hp_e, err_he_e)],
                           ["Source (s.)", "Energized (e.)"], loc="lower left",
                           title="Population", frameon=True,
@@ -315,7 +317,7 @@ def main(args):
 
     # Helium
     axs11[0].errorbar(dpf_eis_peak_a.energy.data, dpf_ratio_a, err_ratio_a,
-                      capsize=4, color="tab:red", linestyle="-",
+                      capsize=4, color="tab:cyan", linestyle="-",
                       label="He$^{2+}$")
 
     axs11[0].set_xlim([0, 700])
@@ -332,7 +334,7 @@ def main(args):
 
     # Helium
     axs11[1].errorbar(dpf_eis_peak_a.energy.data / 2, dpf_ratio_a, err_ratio_a,
-                      capsize=4, color="tab:red", linestyle="-",
+                      capsize=4, color="tab:cyan", linestyle="-",
                       label="He$^{2+}$")
 
     axs11[1].set_xlim([0, 350])

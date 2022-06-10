@@ -106,9 +106,9 @@ def main(args):
     colors_p = ["tab:cyan", "tab:olive", "tab:pink"]
     for i, c_i, c_p in zip(range(3), colors_i, colors_p):
         plot_line(axs[2], v_gsm_i[:, i], color=c_i,
-                  label=f"$V_{{{comp_[i]}i}}$")
+                  label=f"$V_{{i{comp_[i]}}}$")
         plot_line(axs[2], v_gsm_p[:, i], color=c_p,
-                  label=f"$V_{{{comp_[i]}H^+}}$")
+                  label=f"$V_{{H^+{comp_[i]}}}$")
 
     axs[2].set_ylim([-1100, 2200])
     axs[2].legend(frameon=True, loc="upper right", ncol=3)
@@ -143,19 +143,15 @@ def main(args):
     axs[-1].get_shared_x_axes().join(*axs)
 
     fig.align_ylabels(axs)
-    """
-    for ax in axs[:-1]:
-        ax.xaxis.set_ticklabels([])
-    """
     axs[-1].set_xlim(mdates.datestr2num(tint))
 
-    make_labels(axs, [.0075, .9])
+    make_labels(axs, [.01, .9])
     span_tint(axs, cfg["tints"][0], ec="none", fc="tab:purple", alpha=.2)
     span_tint(axs, cfg["tints"][1], ec="none", fc="tab:purple", alpha=.2)
 
     fpi_time = dpf_fpi_omni_i.time.data
     for (i, t_), ax in itertools.product(enumerate(t_idx), axs):
-        ax.axvline(fpi_time[t_], linestyle="--", color="k")
+        ax.axvline(fpi_time[t_], linestyle=":", color="k", linewidth=1.2)
 
     plt.savefig("./figures/figure_2.pdf")
     plt.savefig("./figures/figure_2.png", dpi=200)

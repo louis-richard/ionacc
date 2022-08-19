@@ -16,7 +16,6 @@ import matplotlib.patches as patches
 
 from matplotlib import dates as mdates
 
-
 __author__ = "Louis Richard"
 __email__ = "louisr@irfu.se"
 __copyright__ = "Copyright 2020-2021"
@@ -79,10 +78,16 @@ def plot_tetrahedron(ax, r_gsm_sep):
 
     """
     for i in range(0, 4):
-        ax.plot3D(r_gsm_sep[i][0], r_gsm_sep[i][1], r_gsm_sep[i][2],
-                  marker="d", linestyle="none", markersize=8.5,
-                  label=f"MMS {i + 1}")
-        ax.view_init(elev=20., azim=-70)
+        ax.plot3D(
+            r_gsm_sep[i][0],
+            r_gsm_sep[i][1],
+            r_gsm_sep[i][2],
+            marker="d",
+            linestyle="none",
+            markersize=8.5,
+            label=f"MMS {i + 1}",
+        )
+        ax.view_init(elev=20.0, azim=-70)
 
     for i, j in itertools.combinations([0, 1, 2, 3], 2):
         x_ = [r_gsm_sep[i][0], r_gsm_sep[j][0]]
@@ -119,13 +124,18 @@ def add_eis_charge_state(ax, energy_0, energy_1, charge, **kwargs):
 
     """
 
-    energy_0 = np.hstack([energy_0[0] - np.diff(energy_0)[0], energy_0,
-                          energy_0[-1] + np.diff(energy_0)[-1]])
+    energy_0 = np.hstack(
+        [
+            energy_0[0] - np.diff(energy_0)[0],
+            energy_0,
+            energy_0[-1] + np.diff(energy_0)[-1],
+        ]
+    )
 
     for c in charge:
         for i, e_1 in enumerate(energy_1):
             j = np.argmin(np.abs(c * energy_0 - e_1)) - 1
-            rect = patches.Rectangle((i - .5, j - .5), 1, 1, **kwargs)
+            rect = patches.Rectangle((i - 0.5, j - 0.5), 1, 1, **kwargs)
 
             # Add the patch to the Axes
             ax.add_patch(rect)

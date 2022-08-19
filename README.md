@@ -1,25 +1,11 @@
-# Ion Acceleration at Magnetotail Plasma Jets
-[![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE) [![LASP](https://img.shields.io/badge/datasets-MMS_SDC-orange.svg)](https://lasp.colorado.edu/mms/sdc/)
+# Proton and Helium Ion Acceleration at Magnetotail Plasma Jets
+[![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](./LICENSE.txt) [![LASP](https://img.shields.io/badge/datasets-MMS_SDC-orange.svg)](https://lasp.colorado.edu/mms/sdc/)
 
-Code for the paper Ion Acceleration at Magnetotail Plasma Jets
+Code for the paper Proton and Helium Ion Acceleration at Magnetotail Plasma Jets
 
 ## Abstract
 
-We investigate a series of Earthward bursty bulk flows (BBFs) observed by the 
-Magnetospheric Multiscale (MMS) spacecraft in Earth’s magnetotail at 
-(-24, 7, 4) $R_E$ in Geocentric Solar Magnetospheric (GSM) coordinates. At the 
-leading edges of the BBFs, we observe complex magnetic field structures. In 
-particular, we focus on one which presents a chain of small scale 
-($\sim 0.5 R_E$) dipolarizations, and another with a large scale 
-($\sim 3.5 R_E$) dipolarization. Although the two structures have different 
-scales, both of these structures are associated with flux increases of 
-supra-thermal ions with energies $\gtrsim 100 \textrm{keV}$. We investigate 
-the ion acceleration mechanism and its dependence on the mass and charge state. 
-We show that the ions with gyroradii smaller than the scale of the structure 
-are accelerated by the ion bulk flow. We show that whereas in the small scale 
-structure, ions with gyroradii comparable with the scale of the structure 
-undergo resonance acceleration, and the acceleration in the larger scale 
-structure is more likely due to a spatially limited electric field.
+We investigate two flow bursts in a series of Earthward bursty bulk flows (BBFs) observed by the Magnetospheric Multiscale (MMS) spacecraft in Earth’s magnetotail at (-24, 7, 4)~$R_E$ in Geocentric Solar Magnetospheric (GSM) coordinates. At the leading edges of the BBFs, we observe complex magnetic field structures. In particular, we focus on one BBF which contains large-amplitude magnetic field fluctuations on the time scale of the proton gyroperiod, and another with a large scale dipolarization. For both events, the magnetic field structures are associated with flux increases of supra-thermal ions with energies $\gtrsim 100~\textrm{keV}$. We observe that helium ions dominate the ion flux at energies $\gtrsim 150$ keV. We investigate the ion acceleration mechanism and its dependence on the mass and charge state of H$^+$ and He$^{2+}$ ions. We show that for both events, the ions with gyroradii smaller than the dawn-dusk scale of the structure are accelerated by the ion bulk flow. For ions with larger gyroradii, the acceleration is likely due to a localized spatially limited electric field for the event with a large-scale dipolarization. For the event with fluctuating magnetic field, the acceleration of ions with gyroradii comparable with the scale of the magnetic fluctuations can be explained by resonance acceleration.
 
 ## Reproducing our results
 - Instructions for reproduction are given within each section folder, in 

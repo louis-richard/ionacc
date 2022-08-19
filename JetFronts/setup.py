@@ -14,4 +14,4 @@
 
 from distutils.core import setup
 
-setup(name='JetFronts', version='0.1', packages=['jfs'])
+setup(name="JetFronts", version="0.1", packages=["jfs"])

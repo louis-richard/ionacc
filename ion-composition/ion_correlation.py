@@ -31,19 +31,30 @@ def main(args):
     corr_hplus_henplus = correlation["correlation_hplus_henplus"]
 
     f, ax = plt.subplots(1, figsize=(14, 10))
-    f.subplots_adjust(top=.94, bottom=.06, left=.05, right=.95)
-    im, cbar = plot_heatmap(ax, corr_hplus_henplus,
-                            corr_hplus_henplus.energy_00.data,
-                            corr_hplus_henplus.energy_01.data,
-                            cbarlabel="Correlation", cmap="RdBu",
-                            vmin=0, vmax=1)
+    f.subplots_adjust(top=0.94, bottom=0.06, left=0.05, right=0.95)
+    im, cbar = plot_heatmap(
+        ax,
+        corr_hplus_henplus,
+        corr_hplus_henplus.energy_00.data,
+        corr_hplus_henplus.energy_01.data,
+        cbarlabel="Correlation",
+        cmap="RdBu",
+        vmin=0,
+        vmax=1,
+    )
 
-    annotate_heatmap(im, textcolors=("white", "black"), threshold=.12)
+    annotate_heatmap(im, textcolors=("white", "black"), threshold=0.12)
 
-    add_eis_charge_state(ax, corr_hplus_henplus.energy_00.data,
-                         corr_hplus_henplus.energy_01.data, charge=[1, 2],
-                         linewidth=3, edgecolor="y", facecolor="none",
-                         zorder=3)
+    add_eis_charge_state(
+        ax,
+        corr_hplus_henplus.energy_00.data,
+        corr_hplus_henplus.energy_01.data,
+        charge=[1, 2],
+        linewidth=3,
+        edgecolor="y",
+        facecolor="none",
+        zorder=3,
+    )
 
     cbar.ax.set_ylabel("Correlation")
     ax.set_ylabel("$K_{H^{+}}$ [keV]")
@@ -56,7 +67,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config",
-                        help="Path to the configuration file (.yml)",
-                        required=True, type=str)
+    parser.add_argument(
+        "--config",
+        help="Path to the configuration file (.yml)",
+        required=True,
+        type=str,
+    )
     main(parser.parse_args())

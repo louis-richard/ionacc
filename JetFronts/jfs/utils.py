@@ -48,10 +48,11 @@ def combine_flux_instruments(dpf_omni_inst0, dpf_omni_inst1):
 
     ord_energies = np.argsort(energies)
 
-    dpf_omni = xr.DataArray(tmp_data[:, ord_energies],
-                            coords=[flux_inst1.time.data,
-                                    energies[ord_energies]],
-                            dims=["time", "energy"])
+    dpf_omni = xr.DataArray(
+        tmp_data[:, ord_energies],
+        coords=[flux_inst1.time.data, energies[ord_energies]],
+        dims=["time", "energy"],
+    )
     dpf_omni.data[dpf_omni.data == 0] = np.nan
 
     return dpf_omni
@@ -75,35 +76,35 @@ def find_feeps_clusters(inp):
 
     """
 
-    p = 1. * np.arange(len(inp.time)) / (len(inp.time) - 1)
+    p = 1.0 * np.arange(len(inp.time)) / (len(inp.time) - 1)
     idx_95 = np.min(np.where(p > special.erf(2 / np.sqrt(2)))[0])  # 2 sigma
 
     thresh_flux = []
     for i in range(len(inp.energy)):
         thresh_flux.append(np.sort(inp.data[:, i])[idx_95])
-    
+
     indices = np.where(inp.data[:, 7] > thresh_flux[7])[0]
-    times = np.vstack([inp.time.data[indices[:-1]],
-                       inp.time.data[indices[:-1] + 1]]).T
+    times = np.vstack([inp.time.data[indices[:-1]], inp.time.data[indices[:-1] + 1]]).T
     times = [list(t_) for t_ in list(datetime642iso8601(times))]
     times_d64 = iso86012datetime64(np.array(times))
 
-    idx = np.where(np.diff(times_d64[:, 0]).astype(int) > 140000000000.)[0] + 1
+    idx = np.where(np.diff(times_d64[:, 0]).astype(int) > 140000000000.0)[0] + 1
 
-    times_clusters = [times_d64[:idx[0], :]]
+    times_clusters = [times_d64[: idx[0], :]]
     for i in range(len(idx) - 1):
-        times_clusters.append(times_d64[idx[i]:idx[i + 1], :])
+        times_clusters.append(times_d64[idx[i] : idx[i + 1], :])
 
-    times_clusters.append(iso86012datetime64(np.array(times))[idx[-1]:, :])
-    times_clusters = [t_clust for t_clust in times_clusters if
-                      len(t_clust) > 10]
+    times_clusters.append(iso86012datetime64(np.array(times))[idx[-1] :, :])
+    times_clusters = [t_clust for t_clust in times_clusters if len(t_clust) > 10]
 
     tints = np.array([[t_[0, 0], t_[-1, 1]] for t_ in times_clusters[:-1]])
     tints = tints + np.array([np.timedelta64(-2, "m"), np.timedelta64(0, "m")])
 
     # Check that intervals are within burst mode data intervals
-    tint_brst = [["2017-07-23T16:54:14.000", "2017-07-23T17:13:10.000"],
-                 ["2017-07-23T17:17:04.000", "2017-07-23T17:22:50.000"]]
+    tint_brst = [
+        ["2017-07-23T16:54:14.000", "2017-07-23T17:13:10.000"],
+        ["2017-07-23T17:17:04.000", "2017-07-23T17:22:50.000"],
+    ]
     tint_brst = iso86012datetime64(np.array(tint_brst))
 
     brst_check = np.where(tints[:-1, 0] < tint_brst[:, 0])[0]

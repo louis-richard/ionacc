@@ -16,10 +16,15 @@ from pyrfu.plot import plot_line, span_tint, make_labels, plot_clines
 
 # Local imports
 from jfs.utils import combine_flux_instruments
-from jfs.load import (load_fpi_moments_mmsx, load_hpca_moments,
-                      load_eb_mmsx, load_eis_omni_mmsx,
-                      load_fpi_dpf_omni_mmsx, load_hpca_flux,
-                      load_feeps_dpf_omni_mmsx)
+from jfs.load import (
+    load_fpi_moments_mmsx,
+    load_hpca_moments,
+    load_eb_mmsx,
+    load_eis_omni_mmsx,
+    load_fpi_dpf_omni_mmsx,
+    load_hpca_flux,
+    load_feeps_dpf_omni_mmsx,
+)
 
 __author__ = "Louis Richard"
 __email__ = "louisr@irfu.se"
@@ -27,6 +32,7 @@ __copyright__ = "Copyright 2021"
 __license__ = "Apache 2.0"
 
 plt.style.use("scientific")
+
 
 def main(args):
     # Read time intervals
@@ -85,18 +91,19 @@ def main(args):
 
     # %% Plot
     fig, axs = plt.subplots(6, sharex="all", figsize=(10.2, 14.4))
-    fig.subplots_adjust(top=.95, bottom=.05, left=.11, right=.89, hspace=0)
+    fig.subplots_adjust(top=0.95, bottom=0.05, left=0.11, right=0.89, hspace=0)
 
     plot_line(axs[0], b_gsm)
-    axs[0].legend(["$B_{x}$", "$B_{y}$", "$B_{z}$"], frameon=True,
-                  loc="upper right", ncol=3)
+    axs[0].legend(
+        ["$B_{x}$", "$B_{y}$", "$B_{z}$"], frameon=True, loc="upper right", ncol=3
+    )
     axs[0].set_ylabel("$B$" + "\n" + "[nT]")
 
     plot_line(axs[1], e_gsm[:, 1], color="tab:green", label="$E_y$")
-    plot_line(axs[1], evxb_gsm_i[:, 1], color="tab:blue",
-              label="$(-V_i \\times B)_y$")
-    plot_line(axs[1], evxb_gsm_p[:, 1], color="tab:cyan",
-              label="$(-V_{H^+} \\times B)_y$")
+    plot_line(axs[1], evxb_gsm_i[:, 1], color="tab:blue", label="$(-V_i \\times B)_y$")
+    plot_line(
+        axs[1], evxb_gsm_p[:, 1], color="tab:cyan", label="$(-V_{H^+} \\times B)_y$"
+    )
     axs[1].set_ylim([-12, 12])
     axs[1].legend(frameon=True, loc="upper right", ncol=3)
     axs[1].set_ylabel("$E_y$" + "\n" + "[mV m$^{-1}$]")
@@ -105,37 +112,33 @@ def main(args):
     colors_i = ["tab:blue", "tab:green", "tab:red"]
     colors_p = ["tab:cyan", "tab:olive", "tab:pink"]
     for i, c_i, c_p in zip(range(3), colors_i, colors_p):
-        plot_line(axs[2], v_gsm_i[:, i], color=c_i,
-                  label=f"$V_{{i{comp_[i]}}}$")
-        plot_line(axs[2], v_gsm_p[:, i], color=c_p,
-                  label=f"$V_{{H^+{comp_[i]}}}$")
+        plot_line(axs[2], v_gsm_i[:, i], color=c_i, label=f"$V_{{i{comp_[i]}}}$")
+        plot_line(axs[2], v_gsm_p[:, i], color=c_p, label=f"$V_{{H^+{comp_[i]}}}$")
 
     axs[2].set_ylim([-1100, 2200])
     axs[2].legend(frameon=True, loc="upper right", ncol=3)
     axs[2].set_ylabel("$V_p$" + "\n" + "[km s$^{-1}$]")
 
-    idx = np.logical_and(dpf_omni_p.energy.data > .1,
-                         dpf_omni_p.energy.data < 200)
-    axs[3], caxs3 = plot_clines(axs[3], dpf_omni_p[:, idx], yscale="log",
-                                cscale="log", cmap="viridis")
+    idx = np.logical_and(dpf_omni_p.energy.data > 0.1, dpf_omni_p.energy.data < 200)
+    axs[3], caxs3 = plot_clines(
+        axs[3], dpf_omni_p[:, idx], yscale="log", cscale="log", cmap="viridis"
+    )
     axs[3].set_ylim([1e-1, 7e7])
-    axs[3].set_ylabel("Diff. Flux H$^{+}$" + "\n"
-                      + "[(cm$^{2}$ s sr keV)$^{-1}$]")
+    axs[3].set_ylabel("Diff. Flux H$^{+}$" + "\n" + "[(cm$^{2}$ s sr keV)$^{-1}$]")
     caxs3.set_ylabel("$K_{H^{+}}$ [keV]")
 
-    idx = np.logical_and(dpf_omni_a.energy.data > .1,
-                         dpf_omni_a.energy.data < 200)
-    axs[4], caxs4 = plot_clines(axs[4], dpf_omni_a[:, idx], yscale="log",
-                                cscale="log", cmap="viridis")
+    idx = np.logical_and(dpf_omni_a.energy.data > 0.1, dpf_omni_a.energy.data < 200)
+    axs[4], caxs4 = plot_clines(
+        axs[4], dpf_omni_a[:, idx], yscale="log", cscale="log", cmap="viridis"
+    )
     axs[4].set_ylim([1e-1, 7e7])
-    axs[4].set_ylabel("Diff. Flux He$^{n+}$" + "\n"
-                      + "[(cm$^{2}$ s sr keV)$^{-1}$]")
+    axs[4].set_ylabel("Diff. Flux He$^{n+}$" + "\n" + "[(cm$^{2}$ s sr keV)$^{-1}$]")
     caxs4.set_ylabel("$K_{He^{n+}}$ [keV]")
 
-    idx = np.logical_and(dpf_omni_e.energy.data > .1,
-                         dpf_omni_e.energy.data < 200)
-    axs[5], caxs5 = plot_clines(axs[5], dpf_omni_e[:, idx], yscale="log",
-                                cscale="log", cmap="viridis")
+    idx = np.logical_and(dpf_omni_e.energy.data > 0.1, dpf_omni_e.energy.data < 200)
+    axs[5], caxs5 = plot_clines(
+        axs[5], dpf_omni_e[:, idx], yscale="log", cscale="log", cmap="viridis"
+    )
     axs[5].set_ylim([1e-1, 7e7])
     axs[5].set_ylabel("Diff. Flux e" + "\n" + "[(cm$^{2}$ s sr keV)$^{-1}$]")
     caxs5.set_ylabel("$K_{e}$ [keV]")
@@ -145,9 +148,9 @@ def main(args):
     fig.align_ylabels(axs)
     axs[-1].set_xlim(mdates.datestr2num(tint))
 
-    make_labels(axs, [.01, .9])
-    span_tint(axs, cfg["tints"][0], ec="none", fc="tab:purple", alpha=.2)
-    span_tint(axs, cfg["tints"][1], ec="none", fc="tab:purple", alpha=.2)
+    make_labels(axs, [0.01, 0.9])
+    span_tint(axs, cfg["tints"][0], ec="none", fc="tab:purple", alpha=0.2)
+    span_tint(axs, cfg["tints"][1], ec="none", fc="tab:purple", alpha=0.2)
 
     fpi_time = dpf_fpi_omni_i.time.data
     for (i, t_), ax in itertools.product(enumerate(t_idx), axs):
@@ -159,7 +162,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config",
-                        help="Path to the configuration file (.yml)",
-                        required=True, type=str)
+    parser.add_argument(
+        "--config",
+        help="Path to the configuration file (.yml)",
+        required=True,
+        type=str,
+    )
     main(parser.parse_args())

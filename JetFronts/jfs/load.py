@@ -10,13 +10,27 @@ import numpy as np
 from scipy import constants
 
 from pyrfu.pyrf import cotrans, avg_4sc
-from pyrfu.mms import (get_data, remove_idist_background, get_feeps_alleyes,
-                       feeps_correct_energies, feeps_omni, vdf_omni, psd2dpf,
-                       feeps_flat_field_corrections, feeps_remove_bad_data,
-                       feeps_split_integral_ch, feeps_remove_sun, eis_omni,
-                       get_eis_allt, eis_spin_avg, eis_combine_proton_spec,
-                       eis_spec_combine_sc, hpca_calc_anodes, db_init,
-                       hpca_spin_sum)
+from pyrfu.mms import (
+    get_data,
+    remove_idist_background,
+    get_feeps_alleyes,
+    feeps_correct_energies,
+    feeps_omni,
+    vdf_omni,
+    psd2dpf,
+    feeps_flat_field_corrections,
+    feeps_remove_bad_data,
+    feeps_split_integral_ch,
+    feeps_remove_sun,
+    eis_omni,
+    get_eis_allt,
+    eis_spin_avg,
+    eis_combine_proton_spec,
+    eis_spec_combine_sc,
+    hpca_calc_anodes,
+    db_init,
+    hpca_spin_sum,
+)
 
 __author__ = "Louis Richard"
 __email__ = "louisr@irfu.se"
@@ -58,8 +72,9 @@ def load_r_mmsx(tint: list, config: dict):
     r_gsm_mms = [None for _ in range(4)]
 
     for i, ic in enumerate(range(1, 5)):
-        r_gsm_mms[i] = get_data(f"r_gsm_{suffx_mec}", tint, ic,
-                                data_path=config["data_path"])
+        r_gsm_mms[i] = get_data(
+            f"r_gsm_{suffx_mec}", tint, ic, data_path=config["data_path"]
+        )
         r_gse_mms[i] = cotrans(r_gsm_mms[i], "gsm>gse")
 
     r_gsm_mms_avg = [np.mean(r_xyz.data, axis=0) for r_xyz in r_gsm_mms]
@@ -111,10 +126,10 @@ def load_eb_mmsx(tint: list, config: dict):
     b_gse_mms = [None for _ in range(4)]
     e_gse_mms = [None for _ in range(4)]
 
-    for i, ic in enumerate(range(1, 5)):
-        b_gse_mms[i] = get_data(f"b_gse_{suffx_fgm}", tint, ic)
-        e_gse_mms[i] = get_data(f"e_gse_{suffx_edp}", tint, ic)
-        
+    for i, mms_id in enumerate(range(1, 5)):
+        b_gse_mms[i] = get_data(f"b_gse_{suffx_fgm}", tint, mms_id)
+        e_gse_mms[i] = get_data(f"e_gse_{suffx_edp}", tint, mms_id)
+
     b_gse_mmsx = avg_4sc(b_gse_mms)
     e_gse_mmsx = avg_4sc(e_gse_mms)
 
@@ -184,9 +199,9 @@ def load_fpi_moments(tint, mms_id, config):
     t_gse_i_clean.data /= 1e15 * constants.elementary_charge
 
     # Remove extremely low density points
-    v_gse_i = v_gse_i_clean[n_i_clean > .005, ...]
-    t_gse_i = t_gse_i_clean[n_i_clean > .005, ...]
-    n_i = n_i_clean[n_i_clean > .005]
+    v_gse_i = v_gse_i_clean[n_i_clean > 0.005, ...]
+    t_gse_i = t_gse_i_clean[n_i_clean > 0.005, ...]
+    n_i = n_i_clean[n_i_clean > 0.005]
     p_gse_i = n_i.data[:, None, None] * t_gse_i  # nPa
     p_gse_i.data *= 1e15 * constants.elementary_charge
 
@@ -238,8 +253,8 @@ def load_fpi_moments_mmsx(tint, config):
     moms_i_mms = [[None for _ in range(4)] for _ in range(4)]
     moms_e_mms = [[None for _ in range(4)] for _ in range(4)]
 
-    for i, ic in enumerate(range(1, 5)):
-        moms_i_mms[i], moms_e_mms[i] = load_fpi_moments(tint, ic, config)
+    for i, mms_id in enumerate(range(1, 5)):
+        moms_i_mms[i], moms_e_mms[i] = load_fpi_moments(tint, mms_id, config)
 
     # Number density
     n_i_mmsx = avg_4sc([probe[0] for probe in moms_i_mms])
@@ -264,7 +279,7 @@ def load_fpi_moments_mmsx(tint, config):
 
 
 def load_hpca_moments(tint, mms_id, config):
-    r""""Load HPCA proton (H+) and alpha particles (He2+) moments.
+    r""" "Load HPCA proton (H+) and alpha particles (He2+) moments.
 
     Parameters
     ----------
@@ -299,32 +314,34 @@ def load_hpca_moments(tint, mms_id, config):
 
     # Protons
     # Number density
-    n_p = get_data(f"nhplus_{suffx_hpca}", tint, mms_id,
-                   data_path=config["data_path"])
+    n_p = get_data(f"nhplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"])
 
     # Bulk velocity in GSM coordinates
-    v_gsm_p = get_data(f"vhplus_gsm_{suffx_hpca}", tint, mms_id,
-                       data_path=config["data_path"])
+    v_gsm_p = get_data(
+        f"vhplus_gsm_{suffx_hpca}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Scalar temperature
-    t_p = get_data(f"tshplus_{suffx_hpca}", tint, mms_id,
-                   data_path=config["data_path"])
+    t_p = get_data(f"tshplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"])
 
     # Scalar pressure
     p_p = 1e15 * constants.elementary_charge * n_p.data * t_p  # nPa
 
     # Alpha particles
     # Number density
-    n_a = get_data(f"nheplusplus_{suffx_hpca}", tint, mms_id,
-                   data_path=config["data_path"])
+    n_a = get_data(
+        f"nheplusplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Bulk velocity in GSM coordinates
-    v_gsm_a = get_data(f"vheplusplus_gsm_{suffx_hpca}", tint, mms_id,
-                       data_path=config["data_path"])
+    v_gsm_a = get_data(
+        f"vheplusplus_gsm_{suffx_hpca}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Scalar temperature
-    t_a = get_data(f"tsheplusplus_{suffx_hpca}", tint, mms_id,
-                   data_path=config["data_path"])
+    t_a = get_data(
+        f"tsheplusplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Scalar pressure
     p_a = 1e15 * constants.elementary_charge * n_a.data * t_a  # nPa
@@ -336,7 +353,7 @@ def load_hpca_moments(tint, mms_id, config):
 
 
 def load_hpca_moments_mmsx(tint, config):
-    r""""Load HPCA proton (H+) and alpha particles (He2+) moments for all
+    r""" "Load HPCA proton (H+) and alpha particles (He2+) moments for all
     spacecraft and averages at the center of mass of the tetrahedron.
 
     Parameters
@@ -363,8 +380,8 @@ def load_hpca_moments_mmsx(tint, config):
     moms_p_mms = [[None for _ in range(4)] for _ in range(4)]
     moms_a_mms = [[None for _ in range(4)] for _ in range(4)]
 
-    for i, ic in enumerate(range(1, 5)):
-        moms_p_mms[i], moms_a_mms[i] = load_hpca_moments(tint, ic, config)
+    for i, mms_id in enumerate(range(1, 5)):
+        moms_p_mms[i], moms_a_mms[i] = load_hpca_moments(tint, mms_id, config)
 
     # Number density
     n_p_mmsx = avg_4sc([probe[0] for probe in moms_p_mms])
@@ -419,12 +436,14 @@ def load_hpca_flux(tint, mms_id, config):
     suffx_hpca = f"hpca_{data_rate_}_{data_level}"
 
     # Protons (H+)
-    dpf_hpca_p = get_data(f"dpfhplus_{suffx_hpca}", tint, mms_id,
-                          data_path=config["data_path"])
+    dpf_hpca_p = get_data(
+        f"dpfhplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Alpha particles (He++)
-    dpf_hpca_a = get_data(f"dpfheplusplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"])
-
+    dpf_hpca_a = get_data(
+        f"dpfheplusplus_{suffx_hpca}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Spin start
     s_az = get_data(f"saz_{suffx_hpca}", tint, mms_id, data_path=config["data_path"])
@@ -461,8 +480,8 @@ def load_hpca_flux_mmsx(tint, config):
     dpf_hpca_omni_p_mms = [None for _ in range(1, 5)]
     dpf_hpca_omni_a_mms = [None for _ in range(1, 5)]
 
-    for i, ic in enumerate(range(1, 5)):
-        spec_ = load_hpca_flux(tint, ic, config)
+    for i, mms_id in enumerate(range(1, 5)):
+        spec_ = load_hpca_flux(tint, mms_id, config)
         dpf_hpca_omni_p_mms[i], dpf_hpca_omni_a_mms[i] = spec_
 
     # Proton flux
@@ -503,11 +522,13 @@ def load_fpi_def_omni(tint, mms_id, config):
     data_levl = config["fpi"].get("level", "l2")
     suffx_fpi = f"fpi_{data_rate}_{data_levl}"
 
-    def_fpi_omni_i = get_data(f"defi_{suffx_fpi}", tint, mms_id,
-                              data_path=config["data_path"])
+    def_fpi_omni_i = get_data(
+        f"defi_{suffx_fpi}", tint, mms_id, data_path=config["data_path"]
+    )
 
-    def_fpi_omni_e = get_data(f"defe_{suffx_fpi}", tint, mms_id,
-                              data_path=config["data_path"])
+    def_fpi_omni_e = get_data(
+        f"defe_{suffx_fpi}", tint, mms_id, data_path=config["data_path"]
+    )
 
     return def_fpi_omni_i, def_fpi_omni_e
 
@@ -535,8 +556,8 @@ def load_fpi_def_omni_mmsx(tint, config):
     def_fpi_omni_i_mms = [None for _ in range(4)]
     def_fpi_omni_e_mms = [None for _ in range(4)]
 
-    for i, ic in enumerate(range(1, 5)):
-        spec_ = load_fpi_def_omni(tint, ic, config)
+    for i, mms_id in enumerate(range(1, 5)):
+        spec_ = load_fpi_def_omni(tint, mms_id, config)
         def_fpi_omni_i_mms[i], def_fpi_omni_e_mms[i] = spec_
 
     def_fpi_omni_i_mmsx = avg_4sc(def_fpi_omni_i_mms)
@@ -573,14 +594,16 @@ def load_fpi_dpf_omni(tint, mms_id, config):
     data_levl = config["fpi"].get("level", "l2")
     suffx_fpi = f"fpi_{data_rate}_{data_levl}"
 
-    vdf_fpi_i = get_data(f"pdi_{suffx_fpi}", tint, mms_id,
-                         data_path=config["data_path"])
+    vdf_fpi_i = get_data(
+        f"pdi_{suffx_fpi}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Compute differential particle flux
     dpf_fpi_omni_i = vdf_omni(psd2dpf(vdf_fpi_i))
 
-    vdf_fpi_e = get_data(f"pde_{suffx_fpi}", tint, mms_id,
-                         data_path=config["data_path"])
+    vdf_fpi_e = get_data(
+        f"pde_{suffx_fpi}", tint, mms_id, data_path=config["data_path"]
+    )
 
     # Compute differential particle flux
     dpf_fpi_omni_e = vdf_omni(psd2dpf(vdf_fpi_e))
@@ -610,8 +633,8 @@ def load_fpi_dpf_omni_mmsx(tint, config):
     dpf_fpi_omni_i_mms = [None for _ in range(4)]
     dpf_fpi_omni_e_mms = [None for _ in range(4)]
 
-    for i, ic in enumerate(range(1, 5)):
-        spec_ = load_fpi_dpf_omni(tint, ic, config)
+    for i, mms_id in enumerate(range(1, 5)):
+        spec_ = load_fpi_dpf_omni(tint, mms_id, config)
         dpf_fpi_omni_i_mms[i], dpf_fpi_omni_e_mms[i] = spec_
 
     dpf_fpi_omni_i_mmsx = avg_4sc(dpf_fpi_omni_i_mms)
@@ -650,8 +673,9 @@ def load_feeps_dpf_omni(tint, mms_id, config):
     suffx_feeps = f"{data_rate}_{data_levl}"
 
     # Ions
-    dpf_feeps_alle_i = get_feeps_alleyes(f"fluxi_{suffx_feeps}", tint, mms_id,
-                                         data_path=config["data_path"])
+    dpf_feeps_alle_i = get_feeps_alleyes(
+        f"fluxi_{suffx_feeps}", tint, mms_id, data_path=config["data_path"]
+    )
     dpf_feeps_alle_i = feeps_correct_energies(dpf_feeps_alle_i)
     dpf_feeps_alle_i = feeps_flat_field_corrections(dpf_feeps_alle_i)
     dpf_feeps_alle_i = feeps_remove_bad_data(dpf_feeps_alle_i)
@@ -659,8 +683,9 @@ def load_feeps_dpf_omni(tint, mms_id, config):
     dpf_feeps_omni_i = feeps_omni(feeps_remove_sun(dpf_feeps_alle_i_clean))
 
     # Electrons
-    dpf_feeps_alle_e = get_feeps_alleyes(f"fluxe_{suffx_feeps}", tint, mms_id,
-                                         data_path=config["data_path"])
+    dpf_feeps_alle_e = get_feeps_alleyes(
+        f"fluxe_{suffx_feeps}", tint, mms_id, data_path=config["data_path"]
+    )
     dpf_feeps_alle_e = feeps_correct_energies(dpf_feeps_alle_e)
     dpf_feeps_alle_e = feeps_flat_field_corrections(dpf_feeps_alle_e)
     dpf_feeps_alle_e = feeps_remove_bad_data(dpf_feeps_alle_e)
@@ -694,8 +719,8 @@ def load_feeps_dpf_omni_mmsx(tint, config):
     dpf_feeps_omni_i_mms = [None for _ in range(4)]
     dpf_feeps_omni_e_mms = [None for _ in range(4)]
 
-    for i, ic in enumerate(range(1, 5)):
-        spec_ = load_feeps_dpf_omni(tint, ic, config)
+    for i, mms_id in enumerate(range(1, 5)):
+        spec_ = load_feeps_dpf_omni(tint, mms_id, config)
         dpf_feeps_omni_i_mms[i], dpf_feeps_omni_e_mms[i] = spec_
 
     dpf_feeps_omni_i_mmsx = avg_4sc(dpf_feeps_omni_i_mms)
@@ -742,26 +767,39 @@ def load_eis_allt(specie, tint, mms_id, config):
     suffx_eis = f"{specie}_{data_rate}_{data_levl}"
 
     if specie.lower() == "electron":
-        dpf_eis = get_eis_allt(f"flux_electronenergy_{suffx_eis}", tint,
-                               mms_id, data_path=config["data_path"])
-        cts_eis = get_eis_allt(f"counts_electronenergy_{suffx_eis}", tint,
-                               mms_id, data_path=config["data_path"])
+        dpf_eis = get_eis_allt(
+            f"flux_electronenergy_{suffx_eis}",
+            tint,
+            mms_id,
+            data_path=config["data_path"],
+        )
+        cts_eis = get_eis_allt(
+            f"counts_electronenergy_{suffx_eis}",
+            tint,
+            mms_id,
+            data_path=config["data_path"],
+        )
 
     else:
         # Energy x Time-Of-Flight flux & counts
-        dpf_extof_allt = get_eis_allt(f"flux_extof_{suffx_eis}", tint, mms_id,
-                                      data_path=config["data_path"])
-        cts_extof_allt = get_eis_allt(f"counts_extof_{suffx_eis}", tint,
-                                      mms_id, data_path=config["data_path"])
+        dpf_extof_allt = get_eis_allt(
+            f"flux_extof_{suffx_eis}", tint, mms_id, data_path=config["data_path"]
+        )
+        cts_extof_allt = get_eis_allt(
+            f"counts_extof_{suffx_eis}", tint, mms_id, data_path=config["data_path"]
+        )
 
         if specie.lower() == "proton":
             # Pulse-Height x Time-Of-Flight flux & counts
-            dpf_phxtof_allt = get_eis_allt(f"flux_phxtof_{suffx_eis}", tint,
-                                           mms_id,
-                                           data_path=config["data_path"])
-            cts_phxtof_allt = get_eis_allt(f"counts_phxtof_{suffx_eis}", tint,
-                                           mms_id,
-                                           data_path=config["data_path"])
+            dpf_phxtof_allt = get_eis_allt(
+                f"flux_phxtof_{suffx_eis}", tint, mms_id, data_path=config["data_path"]
+            )
+            cts_phxtof_allt = get_eis_allt(
+                f"counts_phxtof_{suffx_eis}",
+                tint,
+                mms_id,
+                data_path=config["data_path"],
+            )
 
             # Combine Pulse-Height x Time-Of-Flight and Energy x Time-Of-Flight
             dpf_eis = eis_combine_proton_spec(dpf_phxtof_allt, dpf_extof_allt)
@@ -805,12 +843,12 @@ def load_eis_allt_mmsx(specie, tint, config):
     cts_eis_allt_mms = [None for _ in range(3)]
 
     if specie.lower() == "electron":
-        ic = [1, 2, 4]
+        mms_ids = [1, 2, 4]
     else:
-        ic = [2, 3, 4]
+        mms_ids = [2, 3, 4]
 
-    for i, ic in enumerate(ic):
-        spec_ = load_eis_allt(specie, tint, ic, config)
+    for i, mms_id in enumerate(mms_ids):
+        spec_ = load_eis_allt(specie, tint, mms_id, config)
         dpf_eis_allt_mms[i], cts_eis_allt_mms[i] = spec_
 
     return dpf_eis_allt_mms, cts_eis_allt_mms
@@ -852,8 +890,7 @@ def load_eis_omni_mmsx(specie, tint, config):
 
     for (i, dpf), cts in zip(enumerate(dpf_eis_allt_mms), cts_eis_allt_mms):
         dpf_omni_mms[i] = eis_omni(eis_spin_avg(dpf, method="mean"))
-        cts_omni_mms[i] = eis_omni(eis_spin_avg(cts, method="sum"),
-                                   method="sum")
+        cts_omni_mms[i] = eis_omni(eis_spin_avg(cts, method="sum"), method="sum")
 
     dpf_omni = eis_spec_combine_sc(dpf_omni_mms, method="mean")
     cts_omni = eis_spec_combine_sc(cts_omni_mms, method="sum")
